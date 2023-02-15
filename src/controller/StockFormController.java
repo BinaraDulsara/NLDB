@@ -1,27 +1,21 @@
 package controller;
 
-import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
-import model.CustomerModel;
 import model.ItemModel;
-import model.StockModel;
-import org.bytedeco.javacpp.presets.opencv_core;
 import tm.ItemTM;
-import to.CustomerTo;
-import to.StockTo;
+import to.ItemTo;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,11 +23,6 @@ public class StockFormController {
 
     public AnchorPane AddMedicineContext;
     public AnchorPane AddFoodContext;
-    public JFXComboBox stockType;
-    public JFXTextField txtName;
-    public JFXTextField txtQty;
-    public JFXTextField txtId;
-    public JFXTextField txtPrice;
     public TableView<ItemTM> tblItem;
     public TableColumn<ItemTM, String> colId;
     public TableColumn<ItemTM, String> colName;
@@ -41,19 +30,31 @@ public class StockFormController {
     public TableColumn<ItemTM, String> colQty;
     public TableColumn<ItemTM, String> colPrice;
     private final ObservableList<ItemTM>itemTMObservableList=FXCollections.observableArrayList();
+    public JFXTextField txtMedicineName;
+    public JFXTextField txtMedicineQty;
+    public JFXTextField txtMedicineId;
+    public JFXButton btnMedicineUpdate;
+    public JFXButton btnMedicineSave;
+    public JFXButton btnMedicineDelete;
+    public JFXButton btnMedicineCancel;
+    public JFXTextField txtMedicinePrice;
+    public JFXTextField txtFoodName;
+    public JFXTextField txtFoodQty;
+    public JFXTextField txtFoodId;
+    public JFXButton btnFoodUpdate;
+    public JFXButton btnFoodSave;
+    public JFXButton btnFoodDelete;
+    public JFXButton btnFoodCansel;
+    public JFXTextField txtFoodPrice;
 
     public void  initialize(){
         setCellFactory();
         refreshTable();
 
-        String [] types = {"FOOD","MEDICINE"};
-        ObservableList<String> types2 = FXCollections.observableArrayList(types);
-
-        stockType.setItems(types2);
-
         AddFoodContext.setTranslateX(1700);
         AddMedicineContext.setTranslateX(1700);
-
+        AddFoodContext.setVisible(false);
+        AddMedicineContext.setVisible(false);
 
     }
 
@@ -61,8 +62,10 @@ public class StockFormController {
         itemTMObservableList.clear();
         try {
             itemTMObservableList.addAll(ItemModel.getAll().stream().map(i->new ItemTM(i.getId(),i.getName(),i.getType(),i.getQty(),i.getPrice())).collect(Collectors.toList()));
+            tblItem.setItems(itemTMObservableList);
+            tblItem.getSelectionModel().clearSelection();;
         } catch (SQLException | ClassNotFoundException e) {
-            // mokakhari wenna dapan
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
         }
     }
 
@@ -74,143 +77,18 @@ public class StockFormController {
         colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
 
-    public StockTo makeStock(){
-        String id = txtId.getText();
-        String name = txtName.getText();
-       SingleSelectionModel type = stockType.getSelectionModel();
-        int qty = Integer.parseInt(txtQty.getText());
-        double price =  Double.parseDouble(txtPrice.getText());
-
-
-        return new StockTo(id,name,type,qty,price);
-
-    }
-
-    public void updateStock(){
-       StockTo stock = makeStock();
-
-        try {
-            boolean b = StockModel.updateStock(stock);
-            if(b){
-                new Alert(Alert.AlertType.INFORMATION,"Updated").show();
-            }else {
-                new Alert(Alert.AlertType.ERROR,"Fail").show();
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void deleteCustomer(){
-      StockTo stock  = makeStock();
-        //Confirmation AlERT START
-        Optional<ButtonType> buttonType = new Alert(Alert.AlertType.CONFIRMATION, "Do You Want To Delete " + stock.getName()
-                + " From The System...This Cannot Be Recover", ButtonType.YES, ButtonType.NO).showAndWait();
-        boolean no = buttonType.get().getText().equalsIgnoreCase("NO");
-        if(no){
-            new Alert(Alert.AlertType.WARNING,"Customer Not Deleted").show();
-            return;
-        }
-        //Confirmation AlERT END
-        try {
-            //Send Data To Database Start
-            boolean b = StockModel.deleteStock(stock);
-            //Send Data To Database END
-            if(b){
-                new Alert(Alert.AlertType.INFORMATION,"Stock Delete Success").show();
-            }else {
-                new Alert(Alert.AlertType.ERROR,"Stock Not Deleted").show();
-            }
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    public void btnUpdateMed(ActionEvent actionEvent) {
-    }
-
-    public void btnSaveMed(ActionEvent actionEvent) {
-        AddMedicineContext.setTranslateX(1400);
-
-        TranslateTransition slide = new TranslateTransition();
-        slide.setDuration(Duration.seconds(0.2));
-        slide.setNode(AddFoodContext);
-
-        slide.setToX(0);
-        slide.play();
-
-        AddMedicineContext.setTranslateX(-176);
-        slide.setOnFinished((ActionEvent e)-> {
-
-        });
-
-    }
-
-    public void btnDeleteMed(ActionEvent actionEvent) {
-    }
-
-    public void btnCancelMed(ActionEvent actionEvent) {
-        AddMedicineContext.setTranslateX(1400);
-    }
-
-    public void btnUpdateFood(ActionEvent actionEvent) {
-    }
-
-    public void btnSaveFood(ActionEvent actionEvent) {
-       AddFoodContext.setTranslateX(1400);
-
-        TranslateTransition slide = new TranslateTransition();
-        slide.setDuration(Duration.seconds(0.2));
-        slide.setNode( AddMedicineContext);
-
-        slide.setToX(0);
-        slide.play();
-
-        AddFoodContext.setTranslateX(-176);
-        slide.setOnFinished((ActionEvent e)-> {
-
-        });
-        String id = txtId.getText();
-        String name = txtName.getText();
-        String type = stockType.getSelectionModel().getSelectedItem().toString();
-        int qty = Integer.parseInt(txtQty.getText());
-        double price = Double.parseDouble(txtPrice.getText());
-        StockTo stock = new StockTo(id,name,type,qty,price);
-
-        try {
-            boolean b = StockModel.addStock(stock);
-            if(b){
-                new Alert(Alert.AlertType.INFORMATION,"Success").show();
-            }else {
-                new Alert(Alert.AlertType.ERROR,"Failed").show();
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    public void btnDeleteFood(ActionEvent actionEvent) {
-    }
-
-    public void btnCancelFood(ActionEvent actionEvent) {
-        AddFoodContext.setTranslateX(1400);
-    }
 
     public void btnAddMedicine(ActionEvent actionEvent) {
 
         AddFoodContext.setTranslateX(1700);
+        AddFoodContext.setVisible(false);
+
+        AddMedicineContext.setVisible(true);
+
+        resetMedicine();
+        btnMedicineSave.setDisable(false);
+        btnMedicineUpdate.setDisable(true);
+        btnMedicineDelete.setDisable(true);
 
         TranslateTransition slide = new TranslateTransition();
         slide.setDuration(Duration.seconds(0.2));
@@ -225,8 +103,35 @@ public class StockFormController {
         });
     }
 
+    private void resetMedicine(){
+        try {
+            txtMedicineId.setText(ItemModel.getNextId());
+            txtMedicineName.setText(null);
+            txtMedicineQty.setText(null);
+            txtMedicinePrice.setText(null);
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
+    private void resetFood() {
+        try {
+            txtFoodId.setText(ItemModel.getNextId());
+            txtFoodName.setText(null);
+            txtFoodQty.setText(null);
+            txtFoodPrice.setText(null);
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
     public void btnAddFood(ActionEvent actionEvent) {
         AddMedicineContext.setTranslateX(1700);
+        AddMedicineContext.setVisible(false);
+
+        AddFoodContext.setVisible(true);
+
+        resetFood();
 
         TranslateTransition slide = new TranslateTransition();
         slide.setDuration(Duration.seconds(0.2));
@@ -241,7 +146,185 @@ public class StockFormController {
         });
     }
 
-    public void priceOnAction(MouseEvent mouseEvent) {
 
+    public void btnMedicineCancelOnAction(ActionEvent actionEvent) {
+        AddMedicineContext.setTranslateX(1400);
+        AddMedicineContext.setVisible(false);
+    }
+
+    public void btnMedicineDeleteOnAction(ActionEvent actionEvent) {
+        String id = txtMedicineId.getText();
+        Optional<ButtonType> optional = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure ?").showAndWait();
+        if (!optional.isPresent())
+            return;
+        if (optional.get()==ButtonType.OK){
+            try {
+                if (ItemModel.delete(id)) {
+                    btnMedicineCancelOnAction(actionEvent);
+                    refreshTable();
+                    new Alert(Alert.AlertType.WARNING, "Food Deleted").show();
+                } else
+                    throw new SQLException("Fail to delete food !");
+            } catch (SQLException | ClassNotFoundException e) {
+                new Alert(Alert.AlertType.WARNING, e.getMessage()).show();
+            }
+        }
+
+    }
+
+    public void btnMedicineUpdateOnACtion(ActionEvent actionEvent) {
+        String id = txtMedicineId.getText();
+        String name = txtMedicineName.getText();
+        String type = "MEDICINE";
+        int qty = Integer.parseInt(txtMedicineQty.getText());
+        double price = Double.parseDouble(txtMedicinePrice.getText());
+        ItemTo itemTo=new ItemTo(id,name,qty,price,type);
+        try {
+            if(ItemModel.update(itemTo)){
+                refreshTable();
+                btnMedicineCancelOnAction(actionEvent);
+                new Alert(Alert.AlertType.INFORMATION,"Medicine updated !").show();
+            }else
+                throw new SQLException("Medicine update fail !");
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
+    public void btnMedicineSaveOnAction(ActionEvent actionEvent) {
+        String id = txtMedicineId.getText();
+        String name = txtMedicineName.getText();
+        String type = "MEDICINE";
+        int qty = Integer.parseInt(txtMedicineQty.getText());
+        double price = Double.parseDouble(txtMedicinePrice.getText());
+        ItemTo itemTo=new ItemTo(id,name,qty,price,type);
+        try {
+            if(ItemModel.save(itemTo)){
+                refreshTable();
+                resetMedicine();
+                new Alert(Alert.AlertType.INFORMATION,"Medicine saved !").show();
+            }else
+                throw new SQLException("Medicine save fail !");
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
+    public void tblClick(MouseEvent mouseEvent) {
+        if (tblItem.getSelectionModel()==null || tblItem.getSelectionModel().isEmpty()){
+            return;
+        }
+        ItemTM itemTM = tblItem.getSelectionModel().getSelectedItem();
+        if (itemTM.getType().equals("MEDICINE")){
+
+            AddFoodContext.setVisible(false);
+
+            txtMedicineId.setText(itemTM.getId());
+            txtMedicineName.setText(itemTM.getName());
+            txtMedicineQty.setText(String.valueOf(itemTM.getQty()));
+            txtMedicinePrice.setText(String.valueOf(itemTM.getPrice()));
+
+            btnMedicineSave.setDisable(true);
+            btnMedicineUpdate.setDisable(false);
+            btnMedicineDelete.setDisable(false);
+
+            TranslateTransition slide = new TranslateTransition();
+            slide.setDuration(Duration.seconds(0.2));
+            slide.setNode(AddMedicineContext);
+
+            slide.setToX(0);
+            slide.play();
+
+            AddMedicineContext.setTranslateX(-176);
+            slide.setOnFinished((ActionEvent e)-> {
+
+            });
+
+        }else if (itemTM.getType().equals("FOOD")){
+            AddMedicineContext.setVisible(false);
+
+            txtFoodId.setText(itemTM.getId());
+            txtFoodName.setText(itemTM.getName());
+            txtFoodQty.setText(String.valueOf(itemTM.getQty()));
+            txtFoodPrice.setText(String.valueOf(itemTM.getPrice()));
+
+            btnFoodSave.setDisable(true);
+            btnFoodUpdate.setDisable(false);
+            btnFoodDelete.setDisable(false);
+
+            TranslateTransition slide = new TranslateTransition();
+            slide.setDuration(Duration.seconds(0.2));
+            slide.setNode(AddFoodContext);
+
+            slide.setToX(0);
+            slide.play();
+
+            AddFoodContext.setTranslateX(-176);
+            slide.setOnFinished((ActionEvent e)-> {
+
+            });
+        }
+    }
+
+    public void btnFoodUpdateOnAction(ActionEvent actionEvent) {
+        String id = txtFoodId.getText();
+        String name = txtFoodName.getText();
+        String type = "FOOD";
+        int qty = Integer.parseInt(txtFoodQty.getText());
+        double price = Double.parseDouble(txtFoodPrice.getText());
+        ItemTo itemTo=new ItemTo(id,name,qty,price,type);
+        try {
+            if(ItemModel.update(itemTo)){
+                refreshTable();
+                btnFoodCanselOnACtion(actionEvent);
+                new Alert(Alert.AlertType.INFORMATION,"Food updated !").show();
+            }else
+                throw new SQLException("Food update fail !");
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
+    public void btnFoodSaveOnAction(ActionEvent actionEvent) {
+        String id = txtFoodId.getText();
+        String name = txtFoodName.getText();
+        String type = "FOOD";
+        int qty = Integer.parseInt(txtFoodQty.getText());
+        double price = Double.parseDouble(txtFoodPrice.getText());
+        ItemTo itemTo=new ItemTo(id,name,qty,price,type);
+        try {
+            if(ItemModel.save(itemTo)){
+                refreshTable();
+                resetFood();
+                new Alert(Alert.AlertType.INFORMATION,"Food saved !").show();
+            }else
+                throw new SQLException("Food save fail !");
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
+        }
+    }
+
+    public void btnFoodDeleteOnACtion(ActionEvent actionEvent) {
+        String id = txtFoodId.getText();
+        Optional<ButtonType> optional = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure ?").showAndWait();
+        if (!optional.isPresent())
+            return;
+        if (optional.get()==ButtonType.OK){
+            try {
+                if (ItemModel.delete(id)) {
+                    btnFoodCanselOnACtion(actionEvent);
+                    refreshTable();
+                    new Alert(Alert.AlertType.WARNING, "Food Deleted").show();
+                } else
+                    throw new SQLException("Fail to delete food !");
+            } catch (SQLException | ClassNotFoundException e) {
+                new Alert(Alert.AlertType.WARNING, e.getMessage()).show();
+            }
+        }
+    }
+
+    public void btnFoodCanselOnACtion(ActionEvent actionEvent) {
+        AddFoodContext.setTranslateX(1400);
+        AddFoodContext.setVisible(false);
     }
 }

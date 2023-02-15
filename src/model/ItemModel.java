@@ -50,15 +50,12 @@ public class ItemModel {
 
 
     public static boolean update(ItemTo itemTo) throws SQLException, ClassNotFoundException {
-        boolean i =CrudUtil.execute("UPDATE item set name=?, qty=? , price = ? , type = ? where id=?",
+        return CrudUtil.execute("UPDATE stock set name=?, qty=? , price = ? where id=?",
                 itemTo.getName(),
                 itemTo.getQty(),
-                itemTo.getType(),
-                itemTo.getType(),
+                itemTo.getPrice(),
                 itemTo.getId()
         );
-        System.out.println(i);
-        return i;
     }
 
     public static boolean updateQTY(ItemTo itemTo) throws SQLException, ClassNotFoundException {
@@ -83,25 +80,39 @@ public class ItemModel {
         return CrudUtil.execute("update item set qty = qty-? where id = ? ",cartTM.getQty(),cartTM.getItemCode());
     }
 
-    public boolean delete(String id) throws SQLException, ClassNotFoundException {
-        boolean i=CrudUtil.execute("DELETE FROM item WHERE id='"+id+"'");
-        System.out.println(i);
-        return i;
+    public static boolean save(ItemTo itemTo) throws SQLException, ClassNotFoundException {
+        return CrudUtil.execute("INSERT INTO stock VALUES(?,?,?,?,?)",
+                itemTo.getId(),
+                itemTo.getName(),
+                itemTo.getType(),
+                itemTo.getQty(),
+                itemTo.getPrice()
+        );
+    }
+
+    public static String getNextId() throws SQLException, ClassNotFoundException {
+        ResultSet execute = CrudUtil.execute("SELECT id FROM stock ORDER BY id DESC LIMIT 1");
+        if (execute.next()){
+            return String.format("C%03d",Integer.parseInt(execute.getString(1).substring(1))+1);
+        }
+        return "C001";
+    }
+
+    public static boolean delete(String id) throws SQLException, ClassNotFoundException {
+        return CrudUtil.execute("DELETE FROM stock WHERE id=?",id);
     }
 
     public static ArrayList<ItemTo> getAll() throws SQLException, ClassNotFoundException {
-        String type="PRODUCT";
-
         ArrayList<ItemTo> itemView=new ArrayList<>();
-        ResultSet rst=CrudUtil.execute("SELECT * FROM item WHERE type=?",type);
+        ResultSet rst=CrudUtil.execute("SELECT * FROM stock");
 
         while(rst.next()){
             itemView.add(
                     new ItemTo(rst.getString(1),
                             rst.getString(2),
-                            rst.getInt(3),
-                            rst.getDouble(4),
-                            rst.getString(5)
+                            rst.getInt(4),
+                            rst.getDouble(5),
+                            rst.getString(3)
                     )
             );
         }
