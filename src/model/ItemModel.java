@@ -101,7 +101,8 @@ public class ItemModel {
                             rst.getString(2),
                             rst.getInt(3),
                             rst.getDouble(4),
-                            rst.getString(5))
+                            rst.getString(5)
+                    )
             );
         }
         return itemView;

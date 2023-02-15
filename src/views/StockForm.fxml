@@ -40,13 +40,13 @@
                   <Font name="System Bold" size="64.0" />
                </font>
             </Label>
-            <TableView layoutX="10.0" layoutY="490.0" prefHeight="480.0" prefWidth="1630.0" stylesheets="@../assets/style/table.css">
+            <TableView fx:id="tblItem" layoutX="10.0" layoutY="490.0" prefHeight="480.0" prefWidth="1630.0" stylesheets="@../assets/style/table.css">
                <columns>
-                  <TableColumn prefWidth="181.0" text="Customer ID" />
-                  <TableColumn prefWidth="296.0" text="Name" />
-                  <TableColumn prefWidth="369.0" text="Address" />
-                  <TableColumn prefWidth="473.0" text="NIC" />
-                  <TableColumn prefWidth="310.0" text="Mobile Number" />
+                  <TableColumn fx:id="colId" prefWidth="181.0" text="Id" />
+                  <TableColumn fx:id="colName" prefWidth="296.0" text="Name" />
+                  <TableColumn fx:id="colType" prefWidth="369.0" text="type" />
+                  <TableColumn fx:id="colQty" prefWidth="473.0" text="qty on stock" />
+                  <TableColumn fx:id="colPrice" prefWidth="310.0" text="price" />
                </columns>
             </TableView>
             <JFXComboBox layoutX="678.0" layoutY="407.0" prefHeight="31.0" prefWidth="312.0" />
@@ -75,7 +75,7 @@
                   <Font name="System Bold" size="30.0" />
                </font>
             </JFXButton>
-            <AnchorPane fx:id="AddMedicineContext" layoutX="385.0" layoutY="200.0" prefHeight="700.0" prefWidth="900.0" styleClass="log_button" stylesheets="@../assets/style/Style.css">
+            <AnchorPane fx:id="AddMedicineContext" layoutX="385.0" layoutY="200.0" prefHeight="700.0" prefWidth="900.0" styleClass="log_button" stylesheets="@../assets/style/Style.css" visible="false">
                <children>
                   <Label layoutX="10.0" layoutY="10.0" prefHeight="680.0" prefWidth="880.0" style="-fx-background-color: WHITE;" styleClass="ADD_LABEL" stylesheets="@../assets/style/Style.css" />
                   <JFXTextField layoutX="74.0" layoutY="84.0" prefHeight="31.0" prefWidth="312.0" />
@@ -137,7 +137,7 @@
                   <InnerShadow />
                </effect>
             </AnchorPane>
-            <AnchorPane fx:id="AddFoodContext" layoutX="385.0" layoutY="200.0" prefHeight="700.0" prefWidth="900.0" styleClass="log_button" stylesheets="@../assets/style/Style.css">
+            <AnchorPane fx:id="AddFoodContext" layoutX="385.0" layoutY="200.0" prefHeight="700.0" prefWidth="900.0" styleClass="log_button" stylesheets="@../assets/style/Style.css" visible="false">
                <children>
                   <Label layoutX="10.0" layoutY="10.0" prefHeight="680.0" prefWidth="880.0" style="-fx-background-color: WHITE;" styleClass="ADD_LABEL" stylesheets="@../assets/style/Style.css" />
                   <JFXTextField fx:id="txtName" layoutX="514.0" layoutY="154.0" prefHeight="31.0" prefWidth="312.0" promptText="name" />

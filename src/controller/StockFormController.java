@@ -8,17 +8,22 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import model.CustomerModel;
+import model.ItemModel;
 import model.StockModel;
+import org.bytedeco.javacpp.presets.opencv_core;
+import tm.ItemTM;
 import to.CustomerTo;
 import to.StockTo;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class StockFormController {
 
@@ -29,9 +34,18 @@ public class StockFormController {
     public JFXTextField txtQty;
     public JFXTextField txtId;
     public JFXTextField txtPrice;
-    public TableView tblStock;
+    public TableView<ItemTM> tblItem;
+    public TableColumn<ItemTM, String> colId;
+    public TableColumn<ItemTM, String> colName;
+    public TableColumn<ItemTM, String> colType;
+    public TableColumn<ItemTM, String> colQty;
+    public TableColumn<ItemTM, String> colPrice;
+    private final ObservableList<ItemTM>itemTMObservableList=FXCollections.observableArrayList();
 
     public void  initialize(){
+        setCellFactory();
+        refreshTable();
+
         String [] types = {"FOOD","MEDICINE"};
         ObservableList<String> types2 = FXCollections.observableArrayList(types);
 
@@ -41,6 +55,23 @@ public class StockFormController {
         AddMedicineContext.setTranslateX(1700);
 
 
+    }
+
+    private void refreshTable() {
+        itemTMObservableList.clear();
+        try {
+            itemTMObservableList.addAll(ItemModel.getAll().stream().map(i->new ItemTM(i.getId(),i.getName(),i.getType(),i.getQty(),i.getPrice())).collect(Collectors.toList()));
+        } catch (SQLException | ClassNotFoundException e) {
+            // mokakhari wenna dapan
+        }
+    }
+
+    private void setCellFactory() {
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colQty.setCellValueFactory(new PropertyValueFactory<>("qty"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
 
     public StockTo makeStock(){
@@ -101,18 +132,7 @@ public class StockFormController {
         }
     }
 
-    public void setStockTable(){
-        try {
-            ArrayList<StockTo> allStock = StockModel.getAllStock();
-            ObservableList<StockTo> Stocklist = FXCollections.observableArrayList(allStock);
-            tblStock.setItems(Stocklist);
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void btnUpdateMed(ActionEvent actionEvent) {
     }
