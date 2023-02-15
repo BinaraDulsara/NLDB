@@ -46,13 +46,12 @@ public class StockFormController {
     public JFXButton btnFoodDelete;
     public JFXButton btnFoodCansel;
     public JFXTextField txtFoodPrice;
+    public AnchorPane ancStock;
 
     public void  initialize(){
         setCellFactory();
         refreshTable();
 
-        AddFoodContext.setTranslateX(1700);
-        AddMedicineContext.setTranslateX(1700);
         AddFoodContext.setVisible(false);
         AddMedicineContext.setVisible(false);
 
@@ -63,7 +62,6 @@ public class StockFormController {
         try {
             itemTMObservableList.addAll(ItemModel.getAll().stream().map(i->new ItemTM(i.getId(),i.getName(),i.getType(),i.getQty(),i.getPrice())).collect(Collectors.toList()));
             tblItem.setItems(itemTMObservableList);
-            tblItem.getSelectionModel().clearSelection();;
         } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.WARNING,e.getMessage()).show();
         }
@@ -80,9 +78,7 @@ public class StockFormController {
 
     public void btnAddMedicine(ActionEvent actionEvent) {
 
-        AddFoodContext.setTranslateX(1700);
         AddFoodContext.setVisible(false);
-
         AddMedicineContext.setVisible(true);
 
         resetMedicine();
@@ -90,17 +86,17 @@ public class StockFormController {
         btnMedicineUpdate.setDisable(true);
         btnMedicineDelete.setDisable(true);
 
-        TranslateTransition slide = new TranslateTransition();
-        slide.setDuration(Duration.seconds(0.2));
-        slide.setNode(AddMedicineContext);
+    }
 
-        slide.setToX(0);
-        slide.play();
+    public void btnAddFood(ActionEvent actionEvent) {
 
-        AddMedicineContext.setTranslateX(-176);
-        slide.setOnFinished((ActionEvent e)-> {
+        AddMedicineContext.setVisible(false);
+        AddFoodContext.setVisible(true);
+        resetFood();
+        btnFoodSave.setDisable(false);
+        btnFoodUpdate.setDisable(true);
+        btnFoodDelete.setDisable(true);
 
-        });
     }
 
     private void resetMedicine(){
@@ -125,30 +121,8 @@ public class StockFormController {
         }
     }
 
-    public void btnAddFood(ActionEvent actionEvent) {
-        AddMedicineContext.setTranslateX(1700);
-        AddMedicineContext.setVisible(false);
-
-        AddFoodContext.setVisible(true);
-
-        resetFood();
-
-        TranslateTransition slide = new TranslateTransition();
-        slide.setDuration(Duration.seconds(0.2));
-        slide.setNode(AddFoodContext);
-
-        slide.setToX(0);
-        slide.play();
-
-        AddFoodContext.setTranslateX(-176);
-        slide.setOnFinished((ActionEvent e)-> {
-
-        });
-    }
-
 
     public void btnMedicineCancelOnAction(ActionEvent actionEvent) {
-        AddMedicineContext.setTranslateX(1400);
         AddMedicineContext.setVisible(false);
     }
 
@@ -160,9 +134,9 @@ public class StockFormController {
         if (optional.get()==ButtonType.OK){
             try {
                 if (ItemModel.delete(id)) {
-                    btnMedicineCancelOnAction(actionEvent);
                     refreshTable();
                     new Alert(Alert.AlertType.WARNING, "Food Deleted").show();
+                    btnMedicineCancelOnAction(actionEvent);
                 } else
                     throw new SQLException("Fail to delete food !");
             } catch (SQLException | ClassNotFoundException e) {
@@ -182,8 +156,8 @@ public class StockFormController {
         try {
             if(ItemModel.update(itemTo)){
                 refreshTable();
-                btnMedicineCancelOnAction(actionEvent);
                 new Alert(Alert.AlertType.INFORMATION,"Medicine updated !").show();
+                btnMedicineCancelOnAction(actionEvent);
             }else
                 throw new SQLException("Medicine update fail !");
         } catch (SQLException | ClassNotFoundException e) {
@@ -201,8 +175,8 @@ public class StockFormController {
         try {
             if(ItemModel.save(itemTo)){
                 refreshTable();
-                resetMedicine();
                 new Alert(Alert.AlertType.INFORMATION,"Medicine saved !").show();
+                resetMedicine();
             }else
                 throw new SQLException("Medicine save fail !");
         } catch (SQLException | ClassNotFoundException e) {
@@ -228,17 +202,7 @@ public class StockFormController {
             btnMedicineUpdate.setDisable(false);
             btnMedicineDelete.setDisable(false);
 
-            TranslateTransition slide = new TranslateTransition();
-            slide.setDuration(Duration.seconds(0.2));
-            slide.setNode(AddMedicineContext);
-
-            slide.setToX(0);
-            slide.play();
-
-            AddMedicineContext.setTranslateX(-176);
-            slide.setOnFinished((ActionEvent e)-> {
-
-            });
+            AddMedicineContext.setVisible(true);
 
         }else if (itemTM.getType().equals("FOOD")){
             AddMedicineContext.setVisible(false);
@@ -252,17 +216,7 @@ public class StockFormController {
             btnFoodUpdate.setDisable(false);
             btnFoodDelete.setDisable(false);
 
-            TranslateTransition slide = new TranslateTransition();
-            slide.setDuration(Duration.seconds(0.2));
-            slide.setNode(AddFoodContext);
-
-            slide.setToX(0);
-            slide.play();
-
-            AddFoodContext.setTranslateX(-176);
-            slide.setOnFinished((ActionEvent e)-> {
-
-            });
+            AddFoodContext.setVisible(true);
         }
     }
 
@@ -276,8 +230,8 @@ public class StockFormController {
         try {
             if(ItemModel.update(itemTo)){
                 refreshTable();
-                btnFoodCanselOnACtion(actionEvent);
                 new Alert(Alert.AlertType.INFORMATION,"Food updated !").show();
+                btnFoodCanselOnACtion(actionEvent);
             }else
                 throw new SQLException("Food update fail !");
         } catch (SQLException | ClassNotFoundException e) {
@@ -295,8 +249,8 @@ public class StockFormController {
         try {
             if(ItemModel.save(itemTo)){
                 refreshTable();
-                resetFood();
                 new Alert(Alert.AlertType.INFORMATION,"Food saved !").show();
+                resetFood();
             }else
                 throw new SQLException("Food save fail !");
         } catch (SQLException | ClassNotFoundException e) {
@@ -312,9 +266,9 @@ public class StockFormController {
         if (optional.get()==ButtonType.OK){
             try {
                 if (ItemModel.delete(id)) {
-                    btnFoodCanselOnACtion(actionEvent);
                     refreshTable();
                     new Alert(Alert.AlertType.WARNING, "Food Deleted").show();
+                    btnFoodCanselOnACtion(actionEvent);
                 } else
                     throw new SQLException("Fail to delete food !");
             } catch (SQLException | ClassNotFoundException e) {
@@ -324,7 +278,6 @@ public class StockFormController {
     }
 
     public void btnFoodCanselOnACtion(ActionEvent actionEvent) {
-        AddFoodContext.setTranslateX(1400);
         AddFoodContext.setVisible(false);
     }
 }
